@@ -11,7 +11,7 @@ class IndexBuffer {
 
     public:
     IndexBuffer();
-    IndexBuffer(const IndexBuffer& i);
+    IndexBuffer(const IndexBuffer& indexBuffer);
     IndexBuffer(const unsigned int *data, unsigned int count);
     ~IndexBuffer();
 

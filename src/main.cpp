@@ -1,86 +1,120 @@
 #include <iostream>
+#include <chrono>
+#include <algorithm>
 #include <nano/nano.hpp>
 #include <ProtoGL/display.hpp>
-#include <ProtoGL/renderer.hpp>
+#include "objectrenderer.hpp"
+#include "physicsobject.hpp"
+#include "gravityhandler.hpp"
+
+Display display("ProtoPhysics");
+const double SIMULATIONTIMESTEP(1000000000.0 / 1000.0);
+
+void scale(GLFWwindow* window, double xoffset, double yoffset) {
+	glm::mat4 *view = display.getView();
+
+	float scale = 1 / (*view)[0][0];
+	float panx = (*view)[3][0];
+	float pany = (*view)[3][1];
+
+	glm::vec3 offset (panx + 0/scale, pany + 0/scale, 0);
+
+	*view = glm::translate(glm::mat4(1.0f), offset) * glm::scale(glm::mat4(1.0f), glm::vec3( (yoffset == -1 ? 0.9 : 1/0.9 ), (yoffset == -1 ? 0.9 : 1/0.9 ), 0)) * glm::translate(glm::mat4(1.0f),-1.0f * offset) * (*view);
+}
 
 int main(void) {
-    Display display("ProtoPhysics"); 
-    Renderer renderer;
     GLFWwindow* window = display.getWindow();
+	
+	ObjectRenderer objectRenderer;
+	GravityHandler gravityHandler;
+
+	unsigned long long int nextUID = 0;
+	
+	PhysicsObject sun(&nextUID), earth(&nextUID), moon(&nextUID);
+
+	glm::mat4 *view = display.getView();
+	// for(int i = 0; i < 110; i++) {
+	// 	*view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3( 0.9, 0.9, 0)) * glm::translate(glm::mat4(1.0f),-1.0f * glm::vec3(0, 0, 0)) * (*view);
+	// }
+
+	sun.setPosition(glm::vec3(-5, 20, 0));
+	sun.setVelocity(glm::vec3(25, 0, 0));
+	sun.setMass(7.9e14);
+	sun.setRadius(15);
+	sun.setColor(glm::vec3(1, 0.75, 0));
+
+	earth.setPosition(glm::vec3(0, -30, 0));
+	earth.setVelocity(glm::vec3(-15, 0, 0));
+	earth.setMass(7.34767309e14);
+	earth.setRadius(10);
+	earth.setColor(glm::vec3(0, 0.5, 1));
+
+	moon.setPosition(glm::vec3(55, -10, 0));
+	moon.setVelocity(glm::vec3(10, 40, 0));
+	moon.setMass(73.4767309e10);
+	moon.setRadius(6);
+	moon.setColor(glm::vec3(0.75, 0.75, 0.75));
+
+	gravityHandler.addObject(&sun);
+	gravityHandler.addObject(&earth);
+	gravityHandler.addObject(&moon);
+	gravityHandler.setElasticity(0.5);
+
+	objectRenderer.addObject(&sun);
+	objectRenderer.addObject(&earth);
+	objectRenderer.addObject(&moon);
+
+	objectRenderer.setObjectResolution(20);
+
+
     glm::mat4 mvp;
-
-    unsigned int frames = 0;
-	unsigned int framerate;
-	double elapsedTime;
-	double timeStart = ns() / 1000000000.0;
-	double frameStart;
-	double frameEnd;
-	double deltaTimeS;
-
-	//------Select Box-------
-	unsigned int square[6] = {0,1,2,0,2,3};
-	VertexBuffer Svb(nullptr,sizeof(float) * 6 * 4);
-	IndexBuffer Sib(nullptr,6);
-	VertexArray Sva;
-	VertexBufferLayout Slayout;
-	//Position Vec 2
-	Slayout.push(GL_FLOAT,2);
-	//Color Vec 4
-	Slayout.push(GL_FLOAT,4);
-	Sva.addBuffer(Svb,Slayout);
-	Sva.unbind();
-	Svb.unbind();
-	Sib.unbind();
-	//--------------------------
 
 	Shader shader("../res/shaders/basic/vertex.vsh","../res/shaders/basic/fragment.fsh");
 	shader.bind();
 	shader.setUniformMat4f("u_MVP",mvp);
 
-	float* points = (float *)malloc(sizeof(float) * 24);
-	//each vertex
-	for(int i = 0; i < 4; i++) {
-		points[6 * i + 0] = (i < 2 ? 100 : -100);
-		points[6 * i + 1] = (i == 1 || i == 2 ? -100 : 100);
-		points[6 * i + 2] = 1.0f;
-		points[6 * i + 3] = 0.5f;
-		points[6 * i + 4] = 0.5f;
-		points[6 * i + 5] = 0.3f;
-	}
+	glfwSetScrollCallback(window, scale);
 
+	// Event Loop
+	double simulationTime = 0;
     while (!glfwWindowShouldClose(window)) {
-        frameStart = ns() / 1000000000.0;
+		double frameStartTime = ns();
 
+		/***********************************************Simulate Physics***********************************************/
+		// In the event 1 loop takes longer than the simulation's timestep the simulation must catch up before rendering
+		// further frames...
+		for (; simulationTime >= SIMULATIONTIMESTEP; simulationTime -= SIMULATIONTIMESTEP){
+			std::cout << "CATCHING UP..." << std::endl;
+			gravityHandler.simulate(SIMULATIONTIMESTEP);
+		}
+
+		// uncomment this line to max out simulation rate
+		// gravityHandler.simulate(SIMULATIONTIMESTEP);
+
+		/************************************************RENDER FRAME**************************************************/
+		
 		mvp = (*(display.getProjection())) * (*(display.getView()));
 		shader.bind();
 		shader.setUniformMat4f("u_MVP",mvp);
-        renderer.clear();
+		objectRenderer.clear();
+		objectRenderer.render(&shader);
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+		
+		/**************************************************************************************************************/
 
-		// Drawing
-
-		Sib.setIndices(square,6);
-		Svb.setPoints((void*)points,sizeof(float) * 6 * 4);
-		renderer.draw(Sva,Sib,shader);
-
-		//
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-
-        elapsedTime = ns() / 1000000000.0 - timeStart;
-
-        if (elapsedTime >= 1) {
-            framerate = frames;
-            timeStart = ns() / 1000000000.0;
-            frames = 0;
-            std::cout << "FPS: " << framerate << std::endl;
-        }
-
-        frames++;
-        frameEnd = ns() / 1000000000.0;
-        deltaTimeS = frameEnd - frameStart;
+		// Simulates a frame hitch realistically this could just be done by adding some time to the simulation time;
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+			for (long long int i = 0; i < 9999; i++) {
+				std::cout << "FRAME HITCH: " << i << std::endl;
+			}
+		}
+		
+		simulationTime += ns() - frameStartTime;
+		std::cout << "Drawing..." << std::endl;	
     }
     
     glfwTerminate();
     return 0;
 }
+
