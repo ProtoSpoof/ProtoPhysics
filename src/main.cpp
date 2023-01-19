@@ -8,7 +8,7 @@
 #include "gravityhandler.hpp"
 
 Display display("ProtoPhysics", glm::dvec2(1080,1080));
-const double SIMULATIONTIMESTEP(1);
+const double SIMULATIONTIMESTEP(1e-1);
 
 void scale(GLFWwindow* window, double xoffset, double yoffset) {
 	glm::mat4 *view = display.getView();

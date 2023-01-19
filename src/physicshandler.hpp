@@ -3,9 +3,6 @@
 #include <chrono>
 #include <vector>
 #include <algorithm>
-#include <ProtoGL\indexbuffer.hpp>
-#include <ProtoGL\vertexbuffer.hpp>
-#include <ProtoGL\renderer.hpp>
 #include "physicsobject.hpp"
 
 class PhysicsHandler {
@@ -123,6 +120,8 @@ void PhysicsHandler::applyCollisions() {
 void PhysicsHandler::rk4Update(double timeStep) {
     mElapsedSimTime += timeStep;
 
+    applyCollisions();
+
     // Runge-Kutta 4
     // yn1 = yn + (h/6)(k1 + k2 + k3 + k4)
     //
@@ -141,14 +140,14 @@ void PhysicsHandler::rk4Update(double timeStep) {
     // Calculate the accelerations on the objects due to the forces. This is k1v for all objects.
     std::vector<glm::dvec3> k1v;
     for (long int i = 0; i < mObjects.size(); i++) {
-        k1v.push_back(forces[i] / (mObjects[i]->getMass()) * timeStep);
+        k1v.push_back(forces[i] / (mObjects[i]->getMass()));
     }
 
     // b) Calculate k1r for all objects in the system.
     // This is just the velocities of the objects in the system. 
     std::vector<glm::dvec3> k1r;
     for (long int i = 0; i < mObjects.size(); i++) {
-        k1r.push_back(mObjects[i]->getVelocity() * timeStep);
+        k1r.push_back(mObjects[i]->getVelocity());
     }
 
     // Step 2:
@@ -164,13 +163,13 @@ void PhysicsHandler::rk4Update(double timeStep) {
     // Calculate the forces and accelerations at these future positions
     forces = calculateNetForces(futureObjects);
     for (long int i = 0; i < mObjects.size(); i++) {
-        k2v.push_back(forces[i] / (mObjects[i]->getMass()) * timeStep);
+        k2v.push_back(forces[i] / (mObjects[i]->getMass()));
     }
 
     // b) Calculate k2r for all objects in the system
     std::vector<glm::dvec3> k2r;
     for (long int i = 0; i < mObjects.size(); i++) {
-        k2r.push_back(mObjects[i]->getVelocity() * k1v[i] * (timeStep / 2) * timeStep);
+        k2r.push_back(mObjects[i]->getVelocity() + (k1v[i] * (timeStep / 2)));
     }
 
     // Step 3:
@@ -186,13 +185,13 @@ void PhysicsHandler::rk4Update(double timeStep) {
     // Calculate the forces and accelerations at these future positions
     forces = calculateNetForces(futureObjects);
     for (long int i = 0; i < mObjects.size(); i++) {
-        k3v.push_back(forces[i] / (mObjects[i]->getMass()) * timeStep);
+        k3v.push_back(forces[i] / (mObjects[i]->getMass()));
     }
 
     // b) Calculate k2r for all objects in the system
     std::vector<glm::dvec3> k3r;
     for (long int i = 0; i < mObjects.size(); i++) {
-        k3r.push_back(mObjects[i]->getVelocity() * k2v[i] * (timeStep / 2) * timeStep);
+        k3r.push_back(mObjects[i]->getVelocity() + (k2v[i] * (timeStep / 2)) * timeStep);
     }
 
     // Step 4:
@@ -208,13 +207,13 @@ void PhysicsHandler::rk4Update(double timeStep) {
     // Calculate the forces and accelerations at these future positions
     forces = calculateNetForces(futureObjects);
     for (long int i = 0; i < mObjects.size(); i++) {
-        k4v.push_back(forces[i] / (mObjects[i]->getMass()) * timeStep);
+        k4v.push_back(forces[i] / (mObjects[i]->getMass()));
     }
 
     // b) Calculate k2r for all objects in the system
     std::vector<glm::dvec3> k4r;
     for (long int i = 0; i < mObjects.size(); i++) {
-        k4r.push_back(mObjects[i]->getVelocity() * k3v[i] * timeStep * timeStep);
+        k4r.push_back(mObjects[i]->getVelocity() + (k3v[i] * timeStep));
     }
 
     // Step 5:
