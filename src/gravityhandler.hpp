@@ -38,9 +38,9 @@ std::vector<glm::dvec3> GravityHandler::calculateNetForces(std::vector<PhysicsOb
             if (j == i) continue;
 
             // Calculate the distance between the objects
-            auto positionDifference = objects[i].getPosition() - mObjects[j]->getPosition();
+            auto positionDifference = objects[i].getPosition() - objects[j].getPosition();
             double distance = glm::length(positionDifference); 
-            double forceMagnitude = (6.6743e-11) * (objects[i].getMass() * mObjects[j]->getMass() / (distance * distance));
+            double forceMagnitude = (6.6743e-11) * (objects[i].getMass() * objects[j].getMass() / (distance * distance));
 
             netForce += -glm::normalize(positionDifference) * forceMagnitude;
         }

@@ -7,7 +7,7 @@
 #include "physicsobject.hpp"
 #include "gravityhandler.hpp"
 
-Display display("ProtoPhysics", glm::dvec2(1080,1080));
+Display display("ProtoPhysics", glm::dvec2(1920,1080));
 const double SIMULATIONTIMESTEP(1e-1);
 
 void scale(GLFWwindow* window, double xoffset, double yoffset) {
@@ -34,15 +34,15 @@ int main(void) {
 	PhysicsObject earthEuler(&nextUID), moonEuler(&nextUID);
 
 	glm::mat4 *view = display.getView();
-	for(int i = 0; i < 132; i++) {
+	for(int i = 0; i < 131; i++) {
 		*view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3( 0.9, 0.9, 0)) * glm::translate(glm::mat4(1.0f), -1.0f * glm::vec3(0, 0, 0)) * (*view);
 	}
 
 	earthEuler.setMass(5.9722e24);
-	earthEuler.setRadius(6378.14e3);
-	earthEuler.setColor(glm::dvec3(0, 0.5, 1));
+	earthEuler.setRadius(6378.14e4);
+	earthEuler.setColor(glm::dvec3(1, 0, 0));
 	moonEuler.setMass(7.34767309e22);
-	moonEuler.setRadius(1737.4e3);
+	moonEuler.setRadius(1737.4e4);
 	moonEuler.setColor(glm::dvec3(1, 0, 0));
 	
 	earthEuler.setPosition(glm::dvec3(0, 0, 0));
@@ -52,8 +52,8 @@ int main(void) {
 
 
 	PhysicsObject earthRK4(earthEuler), moonRK4(moonEuler);
-	moonRK4.setColor(glm::dvec3(0.5, 1, 0.5));
-	earthRK4.setColor(glm::dvec3(1, 0.5, 0.5));
+	moonRK4.setColor(glm::dvec3(0, 1, 1));
+	earthRK4.setColor(glm::dvec3(0, 1, 1));
 
 
 	gravityHandlerEuler.addObject(&earthEuler);
@@ -104,7 +104,7 @@ int main(void) {
 		// Only draws the frame approximately 160 times every second. Allows for more physics calculations per second at
 		// the expense of the simulations visuals at runtime. This tradeoff can be completely ignored by offloading the
 		// rendering process to another program and simply export the data created by the simulated physics...
-		if (simulationTime >= 1.0/160.0) {
+		// if (simulationTime >= 1.0/160.0) {
 			mvp = (*(display.getProjection())) * (*(display.getView()));
 			shader.bind();
 			shader.setUniformMat4f("u_MVP",mvp);
@@ -112,7 +112,7 @@ int main(void) {
 			objectRenderer.render(&shader);
 			glfwSwapBuffers(window);
 			simulationTime -= 1.0/160.0;
-		}
+		// }
 		
 		/**************************************************************************************************************/
 		
@@ -126,7 +126,7 @@ int main(void) {
 		
 		auto timeDelta = ns() / 1000000000 - frameStartTime;
 
-		simulationTime += timeDelta;
+		// simulationTime += timeDelta;
 		totalTime += timeDelta;
 		// std::cout << "Drawing..." << std::endl;	
     }

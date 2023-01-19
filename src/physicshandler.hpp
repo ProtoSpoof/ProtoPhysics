@@ -24,7 +24,6 @@ class PhysicsHandler {
     void addObject(PhysicsObject *object);
     void removeObject(PhysicsObject object);
     void removeObject(unsigned long long uid);
-    void renderObjects(Renderer *renderer, Shader *shader);
     void eulerUpdate(double timeStep);
     void rk4Update(double timeStep);
     
