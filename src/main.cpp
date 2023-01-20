@@ -52,7 +52,7 @@ int main(void) {
 
 	obj1.setMass(300000);
 	obj2.setMass(1000000);
-	obj3.setMass(20000);
+	obj3.setMass(2000);
 
 	obj1.setColor(glm::dvec3(1, 0, 0));
 	obj2.setColor(glm::dvec3(1, 0, 0));
@@ -66,11 +66,11 @@ int main(void) {
 	obj3RK4.setColor(glm::dvec3(0, 1, 1));
 
 
-	gravityHandlerEuler.addObject(&obj1);
+	// gravityHandlerEuler.addObject(&obj1);
 	gravityHandlerEuler.addObject(&obj2);
 	gravityHandlerEuler.addObject(&obj3);
 	
-	gravityHandlerRK4.addObject(&obj1RK4);
+	// gravityHandlerRK4.addObject(&obj1RK4);
 	gravityHandlerRK4.addObject(&obj2RK4);
 	gravityHandlerRK4.addObject(&obj3RK4);
 	
@@ -78,11 +78,11 @@ int main(void) {
 	gravityHandlerEuler.setElasticity(1);
 	gravityHandlerRK4.setElasticity(1);
 
-	objectRenderer.addObject(&obj1);
+	// objectRenderer.addObject(&obj1);
 	objectRenderer.addObject(&obj2);
 	objectRenderer.addObject(&obj3);
 	
-	objectRenderer.addObject(&obj1RK4);
+	// objectRenderer.addObject(&obj1RK4);
 	objectRenderer.addObject(&obj2RK4);
 	objectRenderer.addObject(&obj3RK4);
 
