@@ -12,7 +12,6 @@ class PhysicsHandler {
 
     protected:
     std::vector<PhysicsObject *> mObjects;
-    void applyCollisions();
     virtual std::vector<glm::dvec3> calculateNetForces() = 0;
     virtual std::vector<glm::dvec3> calculateNetForces(std::vector<PhysicsObject> objects) = 0;
 
@@ -26,6 +25,7 @@ class PhysicsHandler {
     void removeObject(unsigned long long uid);
     void eulerUpdate(double timeStep);
     void rk4Update(double timeStep);
+    void applyCollisions();
     
 };
 
@@ -55,8 +55,6 @@ void PhysicsHandler::removeObject(unsigned long long uid) {
 
 void PhysicsHandler::eulerUpdate(double timeStep) {
     mElapsedSimTime += timeStep;
-    
-    applyCollisions();
 
     auto forces = calculateNetForces();
     
@@ -86,6 +84,7 @@ void PhysicsHandler::eulerUpdate(double timeStep) {
 void PhysicsHandler::applyCollisions() {
     for (int j = 0; j < mObjects.size(); j++) {
 		for (int i = j + 1; i < mObjects.size(); i++) {
+
             // Static Collision Calculations
             glm::dvec3 positionDifference = mObjects[i]->getPosition() - mObjects[j]->getPosition();
             double distance = glm::length(positionDifference);
@@ -118,8 +117,6 @@ void PhysicsHandler::applyCollisions() {
 
 void PhysicsHandler::rk4Update(double timeStep) {
     mElapsedSimTime += timeStep;
-
-    applyCollisions();
 
     // Runge-Kutta 4
     // yn1 = yn + (h/6)(k1 + k2 + k3 + k4)

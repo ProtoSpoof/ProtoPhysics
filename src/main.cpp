@@ -8,7 +8,7 @@
 #include "gravityhandler.hpp"
 
 Display display("ProtoPhysics", glm::dvec2(1920,1080));
-const double SIMULATIONTIMESTEP(1e-1);
+const double SIMULATIONTIMESTEP(10);
 
 void scale(GLFWwindow* window, double xoffset, double yoffset) {
 	glm::mat4 *view = display.getView();
@@ -31,42 +31,60 @@ int main(void) {
 
 	unsigned long long int nextUID = 0;
 	
-	PhysicsObject earthEuler(&nextUID), moonEuler(&nextUID);
+	PhysicsObject obj1(&nextUID), obj2(&nextUID), obj3(&nextUID);
 
-	glm::mat4 *view = display.getView();
-	for(int i = 0; i < 131; i++) {
-		*view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3( 0.9, 0.9, 0)) * glm::translate(glm::mat4(1.0f), -1.0f * glm::vec3(0, 0, 0)) * (*view);
-	}
+	// glm::mat4 *view = display.getView();
+	// for(int i = 0; i < 131; i++) {
+	// 	*view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3( 0.9, 0.9, 0)) * glm::translate(glm::mat4(1.0f), -1.0f * glm::vec3(0, 0, 0)) * (*view);
+	// }
 
-	earthEuler.setMass(5.9722e24);
-	earthEuler.setRadius(6378.14e4);
-	earthEuler.setColor(glm::dvec3(1, 0, 0));
-	moonEuler.setMass(7.34767309e22);
-	moonEuler.setRadius(1737.4e4);
-	moonEuler.setColor(glm::dvec3(1, 0, 0));
+	obj1.setPosition(glm::dvec3(-200));
+	obj2.setPosition(glm::dvec3(200));
+	obj3.setPosition(glm::dvec3(40, -30, 60));
+
+	obj1.setVelocity(glm::dvec3(0));
+	obj2.setVelocity(glm::dvec3(0));
+	obj3.setVelocity(glm::dvec3(0));
+
+	obj1.setRadius(100);
+	obj2.setRadius(50);
+	obj3.setRadius(75);
+
+	obj1.setMass(300000);
+	obj2.setMass(1000000);
+	obj3.setMass(20000);
+
+	obj1.setColor(glm::dvec3(1, 0, 0));
+	obj2.setColor(glm::dvec3(1, 0, 0));
+	obj3.setColor(glm::dvec3(1, 0, 0));
+
+	PhysicsObject obj1RK4(obj1), obj2RK4(obj2), obj3RK4(obj3);
+
+
+	obj1RK4.setColor(glm::dvec3(0, 1, 1));
+	obj2RK4.setColor(glm::dvec3(0, 1, 1));
+	obj3RK4.setColor(glm::dvec3(0, 1, 1));
+
+
+	gravityHandlerEuler.addObject(&obj1);
+	gravityHandlerEuler.addObject(&obj2);
+	gravityHandlerEuler.addObject(&obj3);
 	
-	earthEuler.setPosition(glm::dvec3(0, 0, 0));
-	earthEuler.setVelocity(glm::dvec3(0, 0, 0));
-	moonEuler.setPosition(glm::dvec3(0, earthEuler.getRadius() + 384400000 + moonEuler.getRadius(), 0));
-	moonEuler.setVelocity(glm::dvec3(1022, 0, 0) + earthEuler.getVelocity());
+	gravityHandlerRK4.addObject(&obj1RK4);
+	gravityHandlerRK4.addObject(&obj2RK4);
+	gravityHandlerRK4.addObject(&obj3RK4);
+	
 
-
-	PhysicsObject earthRK4(earthEuler), moonRK4(moonEuler);
-	moonRK4.setColor(glm::dvec3(0, 1, 1));
-	earthRK4.setColor(glm::dvec3(0, 1, 1));
-
-
-	gravityHandlerEuler.addObject(&earthEuler);
-	gravityHandlerEuler.addObject(&moonEuler);
-	gravityHandlerRK4.addObject(&earthRK4);
-	gravityHandlerRK4.addObject(&moonRK4);
 	gravityHandlerEuler.setElasticity(1);
 	gravityHandlerRK4.setElasticity(1);
 
-	objectRenderer.addObject(&earthEuler);
-	objectRenderer.addObject(&moonEuler);
-	objectRenderer.addObject(&moonRK4);
-	objectRenderer.addObject(&earthRK4);
+	objectRenderer.addObject(&obj1);
+	objectRenderer.addObject(&obj2);
+	objectRenderer.addObject(&obj3);
+	
+	objectRenderer.addObject(&obj1RK4);
+	objectRenderer.addObject(&obj2RK4);
+	objectRenderer.addObject(&obj3RK4);
 
 	objectRenderer.setObjectResolution(20);
 
@@ -96,6 +114,9 @@ int main(void) {
 
 		gravityHandlerEuler.eulerUpdate(SIMULATIONTIMESTEP);
 		gravityHandlerRK4.rk4Update(SIMULATIONTIMESTEP);
+
+		gravityHandlerEuler.applyCollisions();
+		gravityHandlerRK4.applyCollisions();
 		
 		/**************************************************************************************************************/
 
