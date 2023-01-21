@@ -96,13 +96,13 @@ void PhysicsHandler::applyCollisions() {
             
 
 
-            std::cout << "COLLISION DETECTED" << std::endl;
-            std::cout << "Pos:" << std::endl;
-            std::cout << mObjects[i]->getPosition().x <<  ", " << mObjects[i]->getPosition().y << ", " << mObjects[i]->getPosition().z << std::endl;
-            std::cout << mObjects[j]->getPosition().x <<  ", " << mObjects[j]->getPosition().y << ", " << mObjects[j]->getPosition().z << std::endl;
+            // std::cout << "COLLISION DETECTED" << std::endl;
+            // std::cout << "Pos:" << std::endl;
+            // std::cout << mObjects[i]->getPosition().x <<  ", " << mObjects[i]->getPosition().y << ", " << mObjects[i]->getPosition().z << std::endl;
+            // std::cout << mObjects[j]->getPosition().x <<  ", " << mObjects[j]->getPosition().y << ", " << mObjects[j]->getPosition().z << std::endl;
 
-            std::cout << "Distance:" << std::endl;
-            std::cout << distance << std::endl;
+            // std::cout << "Distance:" << std::endl;
+            // std::cout << distance << std::endl;
 
 
 
