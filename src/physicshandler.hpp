@@ -86,23 +86,34 @@ void PhysicsHandler::applyCollisions() {
 		for (int i = j + 1; i < mObjects.size(); i++) {
 
             // Static Collision Calculations
-            glm::dvec3 positionDifference = mObjects[i]->getPosition() - mObjects[j]->getPosition();
-            double distance = glm::length(positionDifference);
-            double overlap = distance - (mObjects[i]->getRadius() + mObjects[j]->getRadius());
+           
+            double distance = glm::distance(mObjects[i]->getPosition(), mObjects[j]->getPosition());
 
-            if (overlap > 0) continue;
+            if (distance > mObjects[i]->getRadius() + mObjects[j]->getRadius()) continue;
+            
+            double overlap = (mObjects[i]->getRadius() + mObjects[j]->getRadius() - distance);
+            glm::dvec3 normal = normalize(mObjects[i]->getPosition() - mObjects[j]->getPosition());
+            
+
 
             std::cout << "COLLISION DETECTED" << std::endl;
+            std::cout << "Pos:" << std::endl;
+            std::cout << mObjects[i]->getPosition().x <<  ", " << mObjects[i]->getPosition().y << ", " << mObjects[i]->getPosition().z << std::endl;
+            std::cout << mObjects[j]->getPosition().x <<  ", " << mObjects[j]->getPosition().y << ", " << mObjects[j]->getPosition().z << std::endl;
 
-            glm::dvec3 offset = overlap * 0.5 * positionDifference / distance;
+            std::cout << "Distance:" << std::endl;
+            std::cout << distance << std::endl;
 
-            mObjects[i]->updatePosition(-offset);
-            mObjects[j]->updatePosition(offset);
+
+
+            glm::dvec3 offset = (overlap * 0.5) * normal;
+
+            mObjects[i]->updatePosition(offset);
+            mObjects[j]->updatePosition(-offset);
 
             // Dynamic Collision Calculations
-            positionDifference = mObjects[i]->getPosition() - mObjects[j]->getPosition();
 
-            glm::dvec3 normal = glm::normalize(-positionDifference);
+            normal = glm::normalize(-(mObjects[i]->getPosition() - mObjects[j]->getPosition()));
 
             double dotProduct = glm::dot((mObjects[i]->getVelocity() - mObjects[j]->getVelocity()), normal);
 
@@ -187,7 +198,7 @@ void PhysicsHandler::rk4Update(double timeStep) {
     // b) Calculate k2r for all objects in the system
     std::vector<glm::dvec3> k3r;
     for (long int i = 0; i < mObjects.size(); i++) {
-        k3r.push_back(mObjects[i]->getVelocity() + (k2v[i] * (timeStep / 2)) * timeStep);
+        k3r.push_back(mObjects[i]->getVelocity() + (k2v[i] * (timeStep / 2)));
     }
 
     // Step 4:

@@ -81,11 +81,11 @@ float* ObjectRenderer::calculatePoints() {
     unsigned int count = 0;
     for (PhysicsObject* object : mObjects) {
 		for (int j = 0; j < mObjectResolution; j++) {
-			points[6 * (j + mObjectResolution * count) + 0] = mUnitPoints[2*j] * object->getRadius() + object->getPosition().x;
-			points[6 * (j + mObjectResolution * count) + 1] = mUnitPoints[2*j+1] * object->getRadius() + object->getPosition().y;
-			points[6 * (j + mObjectResolution * count) + 2] = object->getColor()[0];
-			points[6 * (j + mObjectResolution * count) + 3] = object->getColor()[1];
-			points[6 * (j + mObjectResolution * count) + 4] = object->getColor()[2];
+			points[6 * (j + mObjectResolution * count) + 0] = mUnitPoints[2*j] * object->getRadius() * 500 / (500 - object->getPosition().z) + object->getPosition().x;
+			points[6 * (j + mObjectResolution * count) + 1] = mUnitPoints[2*j+1] * object->getRadius() * 500 / (500 - object->getPosition().z) + object->getPosition().y;
+			points[6 * (j + mObjectResolution * count) + 2] = object->getColor()[0] + object->getPosition().z / 100;
+			points[6 * (j + mObjectResolution * count) + 3] = object->getColor()[1] + object->getPosition().z / 100;
+			points[6 * (j + mObjectResolution * count) + 4] = object->getColor()[2] + object->getPosition().z / 100;
 			points[6 * (j + mObjectResolution * count) + 5] = 0.5;
 		}
         count++;

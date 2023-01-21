@@ -8,7 +8,7 @@
 #include "gravityhandler.hpp"
 
 Display display("ProtoPhysics", glm::dvec2(1920,1080));
-const double SIMULATIONTIMESTEP(10);
+const double SIMULATIONTIMESTEP(1e-3);
 
 void scale(GLFWwindow* window, double xoffset, double yoffset) {
 	glm::mat4 *view = display.getView();
@@ -33,26 +33,26 @@ int main(void) {
 	
 	PhysicsObject obj1(&nextUID), obj2(&nextUID), obj3(&nextUID);
 
-	// glm::mat4 *view = display.getView();
-	// for(int i = 0; i < 131; i++) {
-	// 	*view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3( 0.9, 0.9, 0)) * glm::translate(glm::mat4(1.0f), -1.0f * glm::vec3(0, 0, 0)) * (*view);
-	// }
+	glm::mat4 *view = display.getView();
+	for(int i = 0; i < 19; i++) {
+		*view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3( 1/0.9, 1/0.9, 0)) * glm::translate(glm::mat4(1.0f), -1.0f * glm::vec3(0, 0, 0)) * (*view);
+	}
 
-	obj1.setPosition(glm::dvec3(-200));
-	obj2.setPosition(glm::dvec3(200));
-	obj3.setPosition(glm::dvec3(40, -30, 60));
+	// obj1.setPosition(glm::dvec3(-200));
+	obj2.setPosition(glm::dvec3(-100, 0, 0));
+	obj3.setPosition(glm::dvec3(100, 0, 0));
 
-	obj1.setVelocity(glm::dvec3(0));
-	obj2.setVelocity(glm::dvec3(0));
-	obj3.setVelocity(glm::dvec3(0));
+	obj1.setVelocity(glm::dvec3(0, 0, 0));
+	obj2.setVelocity(glm::dvec3(0, -2, 0));
+	obj3.setVelocity(glm::dvec3(0, 2, 0));
 
 	obj1.setRadius(100);
-	obj2.setRadius(50);
-	obj3.setRadius(75);
+	obj2.setRadius(10);
+	obj3.setRadius(10);
 
 	obj1.setMass(300000);
-	obj2.setMass(1000000);
-	obj3.setMass(2000);
+	obj2.setMass(5e13);
+	obj3.setMass(5e13);
 
 	obj1.setColor(glm::dvec3(1, 0, 0));
 	obj2.setColor(glm::dvec3(1, 0, 0));
@@ -86,7 +86,7 @@ int main(void) {
 	objectRenderer.addObject(&obj2RK4);
 	objectRenderer.addObject(&obj3RK4);
 
-	objectRenderer.setObjectResolution(20);
+	objectRenderer.setObjectResolution(100);
 
 
     glm::mat4 mvp;
