@@ -1,49 +1,127 @@
 #pragma once
 
+#include <iostream>
 #include <glm/glm.hpp>
-#include "physicsenvironment.hpp"
+
 
 class PhysicsObject {
-    protected:
+    private:
     unsigned long long int mUID;
     double mMass;
-    glm::vec3 mPosition;
-    glm::vec3 mVelocity;
-    glm::vec3 mAcceleration;
+    double mRadius;
+    glm::dvec3 mPosition;
+    glm::dvec3 mVelocity;
+    glm::dvec3 mAcceleration;
+    glm::dvec3 mColor;
 
     public:
-    virtual void tick();
-    void setPosition(glm::vec3 position);
-    void setVelocity(glm::vec3 velocity);
-    void setAcceleration(glm::vec3 acceleration);
-    glm::vec3 getPosition();
-    glm::vec3 getVelocity();
-    glm::vec3 getAcceleration();
+    PhysicsObject(unsigned long long int *uid);
+    PhysicsObject(const PhysicsObject &object);
+    unsigned long long int getUID();
+    glm::dvec3 getColor();
+    void setColor(glm::dvec3 color);
+    double getRadius();
+    void setRadius(double radius);
+    double getMass();
+    void setMass(double mass);
+    glm::dvec3 getPosition();
+    glm::dvec3 getVelocity();
+    glm::dvec3 getAcceleration();
+    void setPosition(glm::dvec3 position);
+    void setVelocity(glm::dvec3 velocity);
+    void setAcceleration(glm::dvec3 acceleration);
+    void updatePosition(glm::dvec3 position);
+    void updateVelocity(glm::dvec3 velocity);
+    void updateAcceleration(glm::dvec3 acceleration);
+    void print();
 
 };
 
-PhysicsObject::~PhysicsObject() {}
-
-void PhysicsObject::setPosition(glm::vec3 position) {
-    mPosition = position;
+PhysicsObject::PhysicsObject(unsigned long long int *uid) {
+    mUID = (*uid)++;
+    mPosition = glm::dvec3(0, 0, 0);
+    mVelocity = glm::dvec3(0, 0, 0);
+    mAcceleration = glm::dvec3(0, 0, 0);
+    mMass = 1;
 }
 
-void PhysicsObject::setVelocity(glm::vec3 velocity) {
-    mVelocity = velocity;
+PhysicsObject::PhysicsObject(const PhysicsObject &object) {
+    mUID = object.mUID;
+    mMass = object.mMass;
+    mRadius = object.mRadius;
+    mPosition = object.mPosition;
+    mVelocity = object.mVelocity;
+    mAcceleration = object.mAcceleration;
+    mColor = object.mColor;
 }
 
-void PhysicsObject::setAcceleration(glm::vec3 acceleration) {
-    mAcceleration = acceleration;
+glm::dvec3 PhysicsObject::getColor() {
+    return mColor;
 }
 
-glm::vec3 PhysicsObject::getPosition() {
+void PhysicsObject::setColor(glm::dvec3 color) {
+    mColor = color;
+}
+
+double PhysicsObject::getRadius() {
+    return mRadius;
+}
+
+void PhysicsObject::setRadius(double radius) {
+    mRadius = radius;
+}
+
+double PhysicsObject::getMass() {
+    return mMass;
+}
+
+void PhysicsObject::setMass(double mass) {
+    mMass = mass;
+}
+
+unsigned long long int PhysicsObject::getUID() {
+    return mUID;
+}
+
+glm::dvec3 PhysicsObject::getPosition() {
     return mPosition;
 }
 
-glm::vec3 PhysicsObject::getVelocity() {
+glm::dvec3 PhysicsObject::getVelocity() {
     return mVelocity;
 }
 
-glm::vec3 PhysicsObject::getAcceleration() {
+glm::dvec3 PhysicsObject::getAcceleration() {
     return mAcceleration;
+}
+
+void PhysicsObject::setPosition(glm::dvec3 position) {
+    mPosition = position;
+}
+
+void PhysicsObject::setVelocity(glm::dvec3 velocity) {
+    mVelocity = velocity;
+}
+
+void PhysicsObject::setAcceleration(glm::dvec3 acceleration) {
+    mAcceleration = acceleration;
+}
+
+void PhysicsObject::updatePosition(glm::dvec3 position) {
+    mPosition += position;
+}
+
+void PhysicsObject::updateVelocity(glm::dvec3 velocity) {
+    mVelocity += velocity;
+}
+
+void PhysicsObject::updateAcceleration(glm::dvec3 acceleration) {
+    mAcceleration += acceleration;
+}
+
+void PhysicsObject::print() {
+    std::cout << "Object : " << mUID << std::endl;
+    std::cout << "Position: [ " << mPosition.x << ", " << mPosition.y << ", " << mPosition.z << " ]" << std::endl;
+    std::cout << "Velocity: [ " << mVelocity.x << ", " << mVelocity.y << ", " << mVelocity.z << " ]" << std::endl;
+    std::cout << "Acceleration: [ " << mAcceleration.x << ", " << mAcceleration.y << ", " << mAcceleration.z << " ]" << std::endl;
 }
